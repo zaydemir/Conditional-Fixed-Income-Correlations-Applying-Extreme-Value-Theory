@@ -202,61 +202,6 @@ returnSeriesAdjustment = function(dfReturnDataPair){
   dfReturnDataAdj
 }
 
-
-
-
-library( chron )
-library( evir )
-
-
-
-# Set Parameters for input/output data
-# file names
-# SPECIFY OWN PATH
-pPathData                       <- "C:\\Users\\SPECIFY OWN PATH"
-pPathOut                    <- pPathData
-pFileReturns                <- "R_returnData.csv"        # return data measured as excess returns per unit of risk
-
-
-
-# return parameters
-pReturn                     <- "rx"   # rx := excess returns, trt := total returns
-pPerRiskUnit                <- TRUE
-pFlagSimplifyName           <- TRUE
-pFlagAdjustReturns          <- FALSE
-pSectors                    <- c( "usIGCredit", "mbs", "usHYCredit", "cmbs", "abs", "agency", "em", "ust10" )   
-pNSectors                   <- length( pSectors )
-pOmitNA                     <- FALSE
-pThresholdsUpper            <- c( 0.35, 0.25, 0.15, 0.1 )
-
-
-# correlation parameters
-
-# firstLeg is extremely underperforming, secondLeg is extremely outperforming
-pPairs <- list(
-  "firstLeg" =  c( "usIGCredit", "usIGCredit", "usIGCredit", "mbs" ),
-  "secondLeg" = c( "usHYCredit", "cmbs"      , "mbs",        "ust10")
-)
-
-
-# load data
-fileName                    <- paste( c( pPathData, "\\", pFileReturns  ), collapse ="" )
-dfReturns                   <- read.csv( fileName )
-dfReturns                   <- castPricingDate( dfReturns, "PricingDate" )
-pPerRiskUnit                <- FALSE
-dfReturnData                <- prepareInput( dfReturns, pReturn, pPerRiskUnit, pSectors, pFlagSimplifyName, pOmitNA )
-
-
-# summary statistics
-if(FALSE){
-  dfThresholds                <- summarizeThresholds( dfReturnData, pPairs, pThresholdsUpper )
-}
-
-
-
-
-
-
 # likelihood sub-functions
 FofR1Neg <- function( r1, p1, epsilon1, sigma1 ){
   
@@ -382,6 +327,61 @@ LogLikelihood <- function( param ){
   -sum( log( Vectorize( likelihood) ( R1, R2, param[1], param[2], param[3], param[4], param[5], param[6], param[7] )))
   
 }
+
+
+
+library( chron )
+library( evir )
+
+
+
+# Set Parameters for input/output data
+# file names
+# SPECIFY OWN PATH
+pPathData                       <- "C:\\Users\\SPECIFY OWN PATH"
+pPathOut                    <- pPathData
+pFileReturns                <- "R_returnDataPerUnitRisk.csv"        # return data measured as excess returns per unit of risk
+
+
+
+# return parameters
+pReturn                     <- "rx"   # rx := excess returns, trt := total returns
+pPerRiskUnit                <- TRUE
+pFlagSimplifyName           <- TRUE
+pFlagAdjustReturns          <- FALSE
+pSectors                    <- c( "usIGCredit", "mbs", "usHYCredit", "cmbs", "abs", "agency", "em", "ust10" )   
+pNSectors                   <- length( pSectors )
+pOmitNA                     <- FALSE
+pThresholdsUpper            <- c( 0.35, 0.25, 0.15, 0.1 )
+
+
+# correlation parameters
+
+# firstLeg is extremely underperforming, secondLeg is extremely outperforming
+pPairs <- list(
+  "firstLeg" =  c( "usIGCredit", "usIGCredit", "usIGCredit", "mbs" ),
+  "secondLeg" = c( "usHYCredit", "cmbs"      , "mbs",        "ust10")
+)
+
+
+# load data
+fileName                    <- paste( c( pPathData, "\\", pFileReturns  ), collapse ="" )
+dfReturns                   <- read.csv( fileName )
+dfReturns                   <- castPricingDate( dfReturns, "PricingDate" )
+pPerRiskUnit                <- FALSE
+dfReturnData                <- prepareInput( dfReturns, pReturn, pPerRiskUnit, pSectors, pFlagSimplifyName, pOmitNA )
+
+
+# summary statistics
+if(FALSE){
+  dfThresholds                <- summarizeThresholds( dfReturnData, pPairs, pThresholdsUpper )
+}
+
+
+
+
+
+
 
 
 # RUN MLE FOR EXCEEDANCES
